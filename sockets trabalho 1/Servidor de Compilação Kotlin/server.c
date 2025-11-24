@@ -7,7 +7,7 @@
 #include <netinet/in.h>
 #include <sys/wait.h>
 
-// Função para tratar erros padrão [cite: 69]
+// Função para tratar erros padrão
 void error(const char *msg) {
     perror(msg);
     exit(1);
@@ -21,14 +21,14 @@ void sigchld_handler(int s) {
 // Lógica de atendimento ao cliente (Processo Filho)
 void doprocessing(int sock) {
     int n;
-    char buffer[4096]; // Buffer aumentado para caber códigos maiores
+    char buffer[4096];
     char filename[50], cmd_compile[256], cmd_run[256];
     char output_buffer[4096];
     FILE *fp;
 
     bzero(buffer, 4096);
     
-    // 1. Ler o código enviado pelo cliente [cite: 103]
+    // 1. Ler o código enviado pelo cliente
     n = read(sock, buffer, 4095);
     if (n < 0) {
         perror("ERROR reading from socket");
@@ -100,22 +100,22 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    // Criação do Socket [cite: 84]
+    // Criação do Socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) error("ERROR opening socket");
 
-    // Configuração do Endereço [cite: 88-91]
+    // Configuração do Endereço
     bzero((char *) &serv_addr, sizeof(serv_addr));
     portno = atoi(argv[1]);
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port = htons(portno);
 
-    // Bind [cite: 92]
+    // Bind
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
         error("ERROR on binding");
 
-    // Listen (Fila de espera de 5) [cite: 95]
+    // Listen (Fila de espera de 5)
     listen(sockfd, 5);
     
     // Trata processos filhos mortos para evitar zumbis
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
     // LOOP INFINITO PARA ACEITAR MÚLTIPLAS REQUISIÇÕES 
     while (1) {
         clilen = sizeof(cli_addr);
-        // Accept (Bloqueante) [cite: 97]
+        // Accept (Bloqueante)
         newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
         if (newsockfd < 0) error("ERROR on accept");
 
