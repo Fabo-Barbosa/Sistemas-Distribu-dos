@@ -94,6 +94,40 @@ MYSQL* conectar_banco(int porta) {
     return conn;
 }
 
+// Função para enviar um pacote para TODOS os outros nós listados no config.txt
+void propagar_para_vizinhos(Pacote p) {
+    int sock;
+    struct sockaddr_in serv_addr;
+
+    printf(">>> Iniciando Replicacao (Broadcast) <<<\n");
+
+    for (int i = 0; i < total_nos; i++) {
+        // Pula se for eu mesmo
+        if (lista_nos[i].id == MEU_ID) continue;
+
+        // Cria socket temporário
+        if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) continue;
+
+        serv_addr.sin_family = AF_INET;
+        serv_addr.sin_port = htons(lista_nos[i].porta);
+        
+        // IP do vizinho
+        if (inet_pton(AF_INET, lista_nos[i].ip, &serv_addr.sin_addr) <= 0) {
+             close(sock); continue;
+        }
+
+        // Tenta conectar (timeout rápido seria ideal, mas vamos padrão)
+        if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == 0) {
+            // Envia o pacote estruturado
+            send(sock, &p, sizeof(Pacote), 0);
+            printf("-> Replicado com sucesso para No %d (Porta %d)\n", lista_nos[i].id, lista_nos[i].porta);
+        } else {
+            printf("-> Falha ao replicar para No %d (Offline?)\n", lista_nos[i].id);
+        }
+        close(sock);
+    }
+}
+
 // --- MAIN ---
 
 int main() {
@@ -141,35 +175,84 @@ int main() {
 
     // LOOP PRINCIPAL
     while(1) {
-        printf("\nAguardando conexao...\n");
+        printf("\n--- Aguardando instrucao ---\n");
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
             perror("accept");
             continue;
         }
 
-        // Limpa e recebe a estrutura inteira
         memset(&pacote_recebido, 0, sizeof(Pacote));
-        
-        // Lê exatamente o tamanho de um Pacote
         int valread = read(new_socket, &pacote_recebido, sizeof(Pacote));
         
         if (valread > 0) {
-            printf("Recebido pacote do No %d. Tipo: %d\n", pacote_recebido.id_origem, pacote_recebido.tipo);
-
-            // Valida Checksum (Integridade)
-            unsigned long check = calcular_checksum(pacote_recebido.conteudo);
-            if (check != pacote_recebido.checksum) {
-                printf("ERRO: Checksum invalido! Pacote corrompido.\n");
+            // 1. Validação de Segurança (Checksum)
+            if (calcular_checksum(pacote_recebido.conteudo) != pacote_recebido.checksum) {
+                char *erro = "ERRO: Pacote corrompido (Checksum invalido)";
+                send(new_socket, erro, strlen(erro), 0);
                 close(new_socket);
                 continue;
             }
 
-            printf("Conteudo validado: %s\n", pacote_recebido.conteudo);
+            printf("Comando recebido: %s\n", pacote_recebido.conteudo);
+
+            // 2. Conectar no Banco Local
+            // Mapeamento simples: ID 1 usa 3306, ID 2 usa 3307. Se tiver ID 3, usa 3306 de novo (teste)
+            int porta_db_local = (MEU_ID == 2) ? 3307 : 3306;
+            MYSQL *conn = conectar_banco(porta_db_local);
             
-            // TODO: Aqui vamos adicionar a lógica de conectar no banco e replicar
-            // Por enquanto, apenas confirmamos o recebimento.
-            char *msg = "Recebido com sucesso";
-            send(new_socket, msg, strlen(msg), 0);
+            char resposta[4096] = ""; // Buffer para resposta ao cliente
+
+            if (conn) {
+                // 3. Executa a Query Localmente
+                if (mysql_query(conn, pacote_recebido.conteudo)) {
+                    sprintf(resposta, "Erro SQL no No %d: %s", MEU_ID, mysql_error(conn));
+                } else {
+                    // SUCESSO!
+                    // Verifica se é SELECT (leitura) ou INSERT/UPDATE (escrita)
+                    if (strncasecmp(pacote_recebido.conteudo, "SELECT", 6) == 0) {
+                        // Lógica de Leitura (Mostra resultados)
+                        MYSQL_RES *res = mysql_store_result(conn);
+                        if (res) {
+                            MYSQL_ROW row;
+                            int num_fields = mysql_num_fields(res);
+                            sprintf(resposta, "RESULTADOS DO NO %d:\n", MEU_ID);
+                            while ((row = mysql_fetch_row(res))) {
+                                for(int i=0; i<num_fields; i++) {
+                                    strcat(resposta, row[i] ? row[i] : "NULL");
+                                    strcat(resposta, " | ");
+                                }
+                                strcat(resposta, "\n");
+                            }
+                            mysql_free_result(res);
+                        }
+                    } else {
+                        // Lógica de Escrita (INSERT/UPDATE/DELETE)
+                        sprintf(resposta, "Sucesso: Comando executado no No %d.", MEU_ID);
+                        
+                        // 4. LÓGICA DE REPLICAÇÃO (O PULO DO GATO)
+                        // Só repassa para frente se quem mandou foi o CLIENTE (ID 0)
+                        // Se quem mandou foi outro nó (ID > 0), eu paro aqui para evitar loop infinito.
+                        if (pacote_recebido.id_origem == 0) {
+                            printf(">>> Origem Cliente detectada. Iniciando Broadcast...\n");
+                            
+                            // Marca que agora EU (este nó) sou a origem da replicação
+                            pacote_recebido.id_origem = MEU_ID; 
+                            
+                            propagar_para_vizinhos(pacote_recebido);
+                            
+                            strcat(resposta, "\n(Replicacao enviada para a rede)");
+                        } else {
+                            printf(">>> Mensagem de replicacao recebida do No %d. Nao vou repassar.\n", pacote_recebido.id_origem);
+                        }
+                    }
+                }
+                mysql_close(conn);
+            } else {
+                sprintf(resposta, "ERRO CRITICO: No %d nao conseguiu conectar no banco local (%d)!", MEU_ID, porta_db_local);
+            }
+
+            // Devolve a resposta para quem chamou (seja Cliente ou outro Nó)
+            send(new_socket, resposta, strlen(resposta), 0);
         }
         close(new_socket);
     }
