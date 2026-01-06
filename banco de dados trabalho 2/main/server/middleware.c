@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <pthread.h>
+#include <time.h>
 
 // --- DEFINIÇÕES DO SISTEMA ---
 #define MAX_NOS 5
@@ -128,6 +130,49 @@ void propagar_para_vizinhos(Pacote p) {
     }
 }
 
+// --- THREAD DE HEARTBEAT ---
+// Executa em paralelo: A cada 5 segundos, avisa que este nó está vivo.
+void *rotina_heartbeat(void *vargp) {
+    Pacote p_heartbeat;
+    p_heartbeat.tipo = MSG_HEARTBEAT;
+    p_heartbeat.id_origem = MEU_ID;
+    strcpy(p_heartbeat.conteudo, "HEARTBEAT");
+    p_heartbeat.checksum = calcular_checksum(p_heartbeat.conteudo);
+
+    printf(">>> Thread Heartbeat iniciada. Intervalo: 5s <<<\n");
+
+    while(1) {
+        sleep(5); // Dorme por 5 segundos
+
+        // Envia para todos os vizinhos
+        for (int i = 0; i < total_nos; i++) {
+            // Não manda para si mesmo
+            if (lista_nos[i].id == MEU_ID) continue;
+
+            int sock;
+            struct sockaddr_in serv_addr;
+
+            if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) continue;
+
+            serv_addr.sin_family = AF_INET;
+            serv_addr.sin_port = htons(lista_nos[i].porta);
+            if (inet_pton(AF_INET, lista_nos[i].ip, &serv_addr.sin_addr) <= 0) {
+                 close(sock); continue;
+            }
+
+            // Tenta conectar rapidinho só para dar o "Oi"
+            if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == 0) {
+                send(sock, &p_heartbeat, sizeof(Pacote), 0);
+                // Não precisa esperar resposta, é UDP style (fire and forget), mas usando TCP
+            }
+            close(sock);
+        }
+        // Opcional: Descomente para ver no log (pode poluir muito a tela)
+        // printf("[DEBUG] Heartbeat enviado para a rede.\n");
+    }
+    return NULL;
+}
+
 // --- MAIN ---
 
 int main() {
@@ -173,6 +218,10 @@ int main() {
 
     printf("--- Middleware (ID %d) Ouvindo na Porta %d ---\n", MEU_ID, minha_porta);
 
+    // --- NOVO: INICIA O CORAÇÃO ---
+    pthread_t thread_id;
+    pthread_create(&thread_id, NULL, rotina_heartbeat, NULL);
+
     // LOOP PRINCIPAL
     while(1) {
         printf("\n--- Aguardando instrucao ---\n");
@@ -191,6 +240,13 @@ int main() {
                 send(new_socket, erro, strlen(erro), 0);
                 close(new_socket);
                 continue;
+            }
+
+            // --- NOVO: TRATAMENTO DE HEARTBEAT ---
+            if (pacote_recebido.tipo == MSG_HEARTBEAT) {
+                printf("[HEARTBEAT] Recebido sinal de vida do No %d\n", pacote_recebido.id_origem);
+                close(new_socket);
+                continue; // Volta pro início do loop, não executa SQL
             }
 
             printf("Comando recebido: %s\n", pacote_recebido.conteudo);
