@@ -18,8 +18,10 @@
 #define DB_NAME "projeto_distribuido"
 
 // Tipos de Mensagem do Protocolo
-#define MSG_HEARTBEAT 1
-#define MSG_QUERY     2
+#define MSG_HEARTBEAT   1
+#define MSG_QUERY       2
+#define MSG_ELECTION    3  // "Quem manda aqui?"
+#define MSG_COORDINATOR 4  // "Eu mando aqui!"
 
 // --- ESTRUTURAS DE DADOS ---
 
@@ -42,6 +44,11 @@ typedef struct {
 int MEU_ID = 0;
 NoConfig lista_nos[MAX_NOS];
 int total_nos = 0;
+
+// Variáveis Globais de Controle de Liderança
+int ID_LIDER_ATUAL = 0;
+time_t ultima_msg_lider = 0; // Timestamp da última vez que o líder falou
+int estou_em_eleicao = 0;    // Evita começar várias eleições ao mesmo tempo
 
 // --- FUNÇÕES AUXILIARES ---
 
@@ -130,6 +137,55 @@ void propagar_para_vizinhos(Pacote p) {
     }
 }
 
+void iniciar_eleicao() {
+    if (estou_em_eleicao) return;
+    estou_em_eleicao = 1;
+    printf("!!! ALERTA: Lider (No %d) parou de responder. Iniciando Eleicao... !!!\n", ID_LIDER_ATUAL);
+
+    int tenho_chances = 1;
+
+    // Algoritmo Bully: Tenta falar com todo mundo que tem ID MAIOR que o meu
+    for (int i = 0; i < total_nos; i++) {
+        if (lista_nos[i].id <= MEU_ID) continue; // Ignora menores ou eu mesmo
+
+        int sock;
+        struct sockaddr_in serv_addr;
+        
+        if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) continue;
+        serv_addr.sin_family = AF_INET;
+        serv_addr.sin_port = htons(lista_nos[i].porta);
+        inet_pton(AF_INET, lista_nos[i].ip, &serv_addr.sin_addr);
+
+        // Se conseguir conectar em alguém maior, ele é o chefe, eu recuo.
+        if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == 0) {
+            printf("-> Encontrei um no maior (No %d) online. Ele deve assumir.\n", lista_nos[i].id);
+            tenho_chances = 0;
+            
+            // Opcional: Mandar MSG_ELECTION para forçar ele a se declarar, 
+            // mas apenas conectar já prova que ele está vivo.
+            close(sock);
+            break; 
+        }
+        close(sock);
+    }
+
+    if (tenho_chances) {
+        // Se ninguém maior respondeu, EU SOU O NOVO LÍDER!
+        printf(">>> NINGUEM MAIOR RESPONDEU. EU SOU O NOVO LIDER! <<<\n");
+        ID_LIDER_ATUAL = MEU_ID;
+        ultima_msg_lider = time(NULL); // Reseto meu timer
+
+        // Avisa todo mundo (Broadcast MSG_COORDINATOR)
+        Pacote p;
+        p.tipo = MSG_COORDINATOR;
+        p.id_origem = MEU_ID;
+        strcpy(p.conteudo, "NOVO LIDER");
+        p.checksum = calcular_checksum(p.conteudo);
+        propagar_para_vizinhos(p);
+    }
+    estou_em_eleicao = 0;
+}
+
 // --- THREAD DE HEARTBEAT ---
 // Executa em paralelo: A cada 5 segundos, avisa que este nó está vivo.
 void *rotina_heartbeat(void *vargp) {
@@ -139,36 +195,49 @@ void *rotina_heartbeat(void *vargp) {
     strcpy(p_heartbeat.conteudo, "HEARTBEAT");
     p_heartbeat.checksum = calcular_checksum(p_heartbeat.conteudo);
 
-    printf(">>> Thread Heartbeat iniciada. Intervalo: 5s <<<\n");
+    // Inicializa timer
+    ultima_msg_lider = time(NULL); 
+    
+    // Assume provisoriamente que o maior ID da lista é o líder no início
+    int maior_id = 0;
+    for(int i=0; i<total_nos; i++) if(lista_nos[i].id > maior_id) maior_id = lista_nos[i].id;
+    ID_LIDER_ATUAL = maior_id;
+
+    printf(">>> Thread Monitoramento iniciada. Lider atual: %d <<<\n", ID_LIDER_ATUAL);
 
     while(1) {
-        sleep(5); // Dorme por 5 segundos
+        sleep(3); // Verifica a cada 3 segundos
 
-        // Envia para todos os vizinhos
+        // 1. Envia meu sinal de vida (Se eu for líder, isso é crucial. Se não for, é bom pra rede)
         for (int i = 0; i < total_nos; i++) {
-            // Não manda para si mesmo
             if (lista_nos[i].id == MEU_ID) continue;
-
-            int sock;
+            int sock = socket(AF_INET, SOCK_STREAM, 0);
             struct sockaddr_in serv_addr;
-
-            if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) continue;
-
             serv_addr.sin_family = AF_INET;
             serv_addr.sin_port = htons(lista_nos[i].porta);
-            if (inet_pton(AF_INET, lista_nos[i].ip, &serv_addr.sin_addr) <= 0) {
-                 close(sock); continue;
-            }
+            inet_pton(AF_INET, lista_nos[i].ip, &serv_addr.sin_addr);
 
-            // Tenta conectar rapidinho só para dar o "Oi"
+            // Timeout curto no connect para não travar a thread
+            struct timeval timeout;      
+            timeout.tv_sec = 1;
+            timeout.tv_usec = 0;
+            setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+
             if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == 0) {
                 send(sock, &p_heartbeat, sizeof(Pacote), 0);
-                // Não precisa esperar resposta, é UDP style (fire and forget), mas usando TCP
             }
             close(sock);
         }
-        // Opcional: Descomente para ver no log (pode poluir muito a tela)
-        // printf("[DEBUG] Heartbeat enviado para a rede.\n");
+
+        // 2. Verifica se o Líder morreu (Só se eu não for o líder)
+        if (ID_LIDER_ATUAL != MEU_ID) {
+            double segundos_sem_lider = difftime(time(NULL), ultima_msg_lider);
+            
+            // Se passar de 10 segundos sem sinal do líder
+            if (segundos_sem_lider > 10.0) {
+                iniciar_eleicao();
+            }
+        }
     }
     return NULL;
 }
@@ -242,13 +311,29 @@ int main() {
                 continue;
             }
 
-            // --- NOVO: TRATAMENTO DE HEARTBEAT ---
+           // TRATAMENTO DE MENSAGENS ESPECIAIS
+
+            // Caso 1: Recebi um Heartbeat
             if (pacote_recebido.tipo == MSG_HEARTBEAT) {
-                printf("[HEARTBEAT] Recebido sinal de vida do No %d\n", pacote_recebido.id_origem);
+                // Se veio do Líder, atualizo o relógio
+                if (pacote_recebido.id_origem == ID_LIDER_ATUAL) {
+                    ultima_msg_lider = time(NULL);
+                    // Opcional: printf("Heartbeat do Lider %d recebido.\n", ID_LIDER_ATUAL);
+                }
                 close(new_socket);
-                continue; // Volta pro início do loop, não executa SQL
+                continue;
             }
 
+            // Caso 2: Recebi aviso de Novo Coordenador
+            if (pacote_recebido.tipo == MSG_COORDINATOR) {
+                printf(">>> ATENCAO: No %d se declarou o NOVO LIDER! <<<\n", pacote_recebido.id_origem);
+                ID_LIDER_ATUAL = pacote_recebido.id_origem;
+                ultima_msg_lider = time(NULL); // Renova a confiança
+                close(new_socket);
+                continue;
+            }
+
+            // Caso 3: SQL Normal (MSG_QUERY)
             printf("Comando recebido: %s\n", pacote_recebido.conteudo);
 
             // 2. Conectar no Banco Local
