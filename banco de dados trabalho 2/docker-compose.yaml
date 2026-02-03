@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  # O Banco de Dados DESTE Computador
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: banco_distribuido
+    ports:
+      - "3306:3306" # Libera acesso para o DBeaver Local e EXTERNO
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # O Código Python DESTE Computador
+  app:
+    build: .
+    restart: always
+    network_mode: host # <--- O PULO DO GATO: Usa o IP real da máquina, sem bloqueio
+    environment:
+      - DB_HOST=127.0.0.1 # Como estamos em modo host, o banco é local
+    depends_on:
+      - db
