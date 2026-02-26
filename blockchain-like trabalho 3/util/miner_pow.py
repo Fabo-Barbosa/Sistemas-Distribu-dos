@@ -4,6 +4,7 @@ import time
 from typing import Any, Dict, List, Optional, Callable
 from .transaction import criar_transacao
 from .block import criar_bloco, calcular_hash_bloco, validar_proof_of_work
+from .blockchain import adicionar_bloco
 
 # Configuração da Recompensa
 RECOMPENSA_MINERACAO = 50.0
@@ -58,7 +59,8 @@ def minerar_bloco(
         # Verifica se atingiu a dificuldade
         if validar_proof_of_work(bloco, dificuldade):
             no_estado["mining_active"] = False
-            return bloco
+            if adicionar_bloco(no_estado["blockchain"], bloco):
+                return bloco
 
         # Incrementa o nonce para a próxima tentativa
         bloco["nonce"] += 1

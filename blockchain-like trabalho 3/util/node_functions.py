@@ -21,6 +21,7 @@ def criar_estado_no(host: str = "localhost", port: int = 5000) -> Dict[str, Any]
     """
     Inicializa o 'cérebro' do nó. Substitui o __init__ da classe Node.
     """
+    #print(port)
     return {
         "host": host,
         "port": port,
@@ -39,7 +40,6 @@ def iniciar_no(no_estado: Dict[str, Any]):
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind(("0.0.0.0", no_estado["port"]))
     sock.listen(10)
-    
     no_estado["server_socket"] = sock
     no_estado["running"] = True
     no_estado["logger"].info(f"Nó procedural ativo em {no_estado['address']}")
@@ -54,7 +54,7 @@ def _loop_aceitar_conexoes(no_estado: Dict[str, Any]):
     while no_estado["running"]:
         try:
             client_sock, addr = no_estado["server_socket"].accept()
-            print(f"Recebi conexão de {addr}!")
+            print(f"Aceitando conexão de {addr}")
             thread = threading.Thread(target=_tratar_cliente, args=(no_estado, client_sock, addr))
             thread.daemon = True
             thread.start()
@@ -111,6 +111,8 @@ def _processar_mensagem(no_estado: Dict[str, Any], msg: Dict[str, Any]) -> Optio
     m_type = msg.get("type")
     sender = msg.get("sender")
     payload = msg.get("payload", {})
+    print(payload)
+    print(m_type)
 
     with no_estado["lock"]:
         if m_type == "NEW_TRANSACTION":

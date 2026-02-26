@@ -15,6 +15,7 @@ class BlockchainApp:
         self.root = root
         self.root.title(f"Blockchain Node - {host}:{port}")
         self.root.geometry("700x600")
+        #print(port)
 
         # 1. Inicializa o Estado do Nó (Procedural)
         self.no_estado = criar_estado_no(host, port)
@@ -94,7 +95,7 @@ class BlockchainApp:
                 val = float(ent_valor.get())
                 
                 # Lógica procedural: cria e propaga
-                from src.transaction import criar_transacao
+                from util.transaction import criar_transacao
                 tx = criar_transacao(self.no_estado["address"], dest, val)
                 
                 if adicionar_transacao(self.no_estado["blockchain"], tx):
@@ -132,8 +133,12 @@ class BlockchainApp:
 
     def acao_sync(self):
         self.log("Sincronizando com peers...")
+        from util.protocolo import msg_solicitar_chain
+        msg = msg_solicitar_chain()
+        # Adiciona o sender para o peer saber para quem responder
+        msg["sender"] = self.no_estado["address"] 
+        propagar_mensagem(self.no_estado, msg)
         self.atualizar_saldo_ui()
-        # Aqui você chamaria a lógica de solicitar REQUEST_CHAIN para todos os peers
 
 # --- Inicialização ---
 if __name__ == "__main__":
