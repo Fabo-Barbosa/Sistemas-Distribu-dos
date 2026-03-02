@@ -95,7 +95,7 @@ def _tratar_cliente(no_estado: Dict[str, Any], sock: socket.socket, addr: tuple)
 
                     no_estado["logger"].info(f"Resposta {resposta["type"]} encaminhada {mensagem["sender"]}")
             except Exception as e:
-                no_estado["logger"].error(f"Falha ao conectar em {peer_addr}: {e}")
+                no_estado["logger"].error(f"Falha ao conectar em {addr}: {e}")
 
     except Exception as e:
         no_estado["logger"].error(f"Erro ao tratar cliente {addr}: {e}")
@@ -129,10 +129,10 @@ def _processar_mensagem(no_estado: Dict[str, Any], msg: Dict[str, Any]) -> Optio
             return None
         
         elif m_type == MessageType.DISCOVER_PEERS.value:
-            return criar_mensagem(MessageType.PEERS_LIST.value, {"peers": no_estado.get("peers")}, no_estado.get("address"))
+            return criar_mensagem(MessageType.PEERS_LIST, {"peers": no_estado.get("peers")}, no_estado.get("address"))
         
         elif m_type == MessageType.PEERS_LIST.value:
-            novos_peers = payload["peers"] - no_estado["peers"] - no_estado["address"]
+            novos_peers = payload["peers"] - no_estado["peers"] - {no_estado["address"]}
             for peer in novos_peers:
                 no_estado["peers"].add(peer)
             return None
@@ -141,7 +141,7 @@ def _processar_mensagem(no_estado: Dict[str, Any], msg: Dict[str, Any]) -> Optio
             tx = payload["transaction"]
             if adicionar_transacao(no_estado["blockchain"], tx):
                 # Propaga para os outros (exceto quem enviou)
-                propagar_mensagem(no_estado, msg, ignore_addr=sender)
+                propagar_mensagem(no_estado, msg, peers_propag=(no_estado["peers"] - {sender}))
                 
         elif m_type == MessageType.NEW_BLOCK.value:
             bloco = payload["block"]
@@ -157,7 +157,7 @@ def _processar_mensagem(no_estado: Dict[str, Any], msg: Dict[str, Any]) -> Optio
             elif bloco["index"] > proximo_index_esperado:
                 # Estamos atrasados! Pedimos a chain completa
                 no_estado["logger"].info("Recebido bloco muito avançado. Solicitando sincronização completa...")
-                from src.protocolo import msg_solicitar_chain
+                from util.protocolo import msg_solicitar_chain
                 return msg_solicitar_chain() 
 
         elif m_type == MessageType.RESPONSE_CHAIN.value:
@@ -277,10 +277,35 @@ def propagar_mensagem(no_estado: Dict[str, Any], msg: Dict[str, Any], peers_prop
         def enviar():
             try:
                 h, p = peer.split(":")
+                conectado = False
+                resposta = None
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     s.settimeout(5)
                     s.connect((h, int(p)))
                     s.sendall(mensagem_para_bytes(msg))
+
+                    try:
+                        #  Ler o tamanho da mensagem (4 bytes)
+                        length_data = s.recv(4)
+                        if not length_data: 
+                            return
+
+                        length = int.from_bytes(length_data, 'big')
+
+                        # 2. Ler o corpo da mensagem (JSON)
+                        raw_data = s.recv(length)
+                        if not raw_data:
+                            return
+
+                        resposta = bytes_para_mensagem(raw_data)
+                        if resposta and resposta["type"] == MessageType.RESPONSE_CHAIN.value:
+                            chain_recebida = resposta["payload"]["blockchain"]["chain"]
+                            if substituir_pela_corrente_mais_longa(no_estado, chain_recebida):
+                                no_estado["logger"].info("Blockchain sincronizada com a versão mais longa dos peers.")
+
+                    except Exception as e:
+                        no_estado["logger"].error(f"Falha ao conectar: {e}")
+
             except:
                 pass # Peer offline, ignorar ou remover da lista
         

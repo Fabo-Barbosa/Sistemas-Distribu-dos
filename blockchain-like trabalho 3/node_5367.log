@@ -1,0 +1,87 @@
+INFO:Node:5367:Nó procedural ativo em localhost:5367
+INFO:Node:5367:Mensagem PING propagada para 6 peers.
+INFO:Node:5367:Conectado ao peer 10.111.64.135:5000
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 6 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 6 peers.
+INFO:Node:5367:Nó procedural ativo em localhost:5367
+INFO:Node:5367:Mensagem PING propagada para 10 peers.
+INFO:Node:5367:Conectado ao peer 10.111.64.135:5000
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 10 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 10 peers.
+INFO:Node:5367:Minerando bloco #13...
+INFO:Node:5367:Mensagem NEW_BLOCK propagada para 10 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 10 peers.
+INFO:Node:5367:Nó procedural ativo em localhost:5367
+INFO:Node:5367:Mensagem PING propagada para 10 peers.
+INFO:Node:5367:Conectado ao peer 10.111.64.135:5000
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 10 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 10 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 10 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 10 peers.
+INFO:Node:5367:Nó procedural ativo em localhost:5367
+ERROR:Node:5367:Falha ao conectar em 10.111.64.135:5000: [WinError 10065] Uma operação de soquete foi tentada em um host inacessível
+INFO:Node:5367:Nó procedural ativo em localhost:5367
+ERROR:Node:5367:Falha ao conectar em 10.111.64.135:5000: [WinError 10065] Uma operação de soquete foi tentada em um host inacessível
+INFO:Node:5367:Nó procedural ativo em localhost:5367
+ERROR:Node:5367:Falha ao conectar em 10.111.64.135:5000: timed out
+INFO:Node:5367:Nó procedural ativo em localhost:5367
+ERROR:Node:5367:Falha ao conectar em 10.111.64.135:5000: timed out
+INFO:Node:5367:Nó procedural ativo em localhost:5367
+INFO:Node:5367:Nó procedural ativo em 10.111.64.242:5367
+ERROR:Node:5367:Falha ao conectar em 10.111.64.135:5000: timed out
+INFO:Node:5367:Nó procedural ativo em 10.111.64.242:5367
+INFO:Node:5367:Nó procedural ativo em 10.111.64.242:5367
+ERROR:Node:5367:Falha ao conectar em 10.111.64.8:5001: timed out
+INFO:Node:5367:Nó procedural ativo em 10.111.64.242:5367
+INFO:Node:5367:Minerando bloco #6...
+INFO:Node:5367:Mensagem NEW_BLOCK propagada para 0 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5367:Nó procedural ativo em 10.111.64.242:5367
+ERROR:Node:5367:Falha ao conectar em 10.111.64.8:5001: timed out
+INFO:Node:5367:Nó procedural ativo em 10.111.64.242:5367
+ERROR:Node:5367:Falha ao conectar em 10.111.64.135:5000: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente
+INFO:Node:5367:Nó procedural ativo em 10.111.64.242:5367
+INFO:Node:5367:Mensagem PING propagada para 4 peers.
+INFO:Node:5367:Conectado ao peer 10.111.64.135:5000
+INFO:Node:5367:Minerando bloco #3...
+INFO:Node:5367:Mensagem NEW_BLOCK propagada para 4 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 4 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 4 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 4 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 4 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 4 peers.
+INFO:Node:5367:Nó procedural ativo em 10.111.64.242:5367
+INFO:Node:5367:Mensagem PING propagada para 8 peers.
+INFO:Node:5367:Conectado ao peer 10.111.64.135:5000
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 8 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 8 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 8 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 8 peers.
+INFO:Node:5367:Nó procedural ativo em 10.111.64.242:5367
+INFO:Node:5367:Mensagem PING propagada para 10 peers.
+INFO:Node:5367:Conectado ao peer 10.111.64.135:5000
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 10 peers.
+ERROR:Node:5367:Falha ao conectar: 'blockchain'
+ERROR:Node:5367:Falha ao conectar: Expecting ',' delimiter: line 1 column 4377 (char 4376)
+ERROR:Node:5367:Falha ao conectar: timed out
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 10 peers.
+INFO:Node:5367:Blockchain sincronizada com a versão mais longa dos peers.
+ERROR:Node:5367:Falha ao conectar: 'blockchain'
+ERROR:Node:5367:Falha ao conectar: Expecting ',' delimiter: line 1 column 4377 (char 4376)
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 10 peers.
+ERROR:Node:5367:Falha ao conectar: 'blockchain'
+INFO:Node:5367:Blockchain sincronizada com a versão mais longa dos peers.
+INFO:Node:5367:Nó procedural ativo em 10.111.64.242:5367
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5367:Minerando bloco #5...
+INFO:Node:5367:Mensagem NEW_BLOCK propagada para 0 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5367:Nó procedural ativo em 10.111.64.242:5367
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5367:Nó procedural ativo em 10.111.64.242:5367
+INFO:Node:5367:Mensagem REQUEST_CHAIN propagada para 0 peers.

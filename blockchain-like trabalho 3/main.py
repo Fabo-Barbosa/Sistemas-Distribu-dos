@@ -130,7 +130,7 @@ class BlockchainApp:
                     from util.protocolo import msg_novo_bloco
                     msg = msg_novo_bloco(bloco)
                     msg["sender"] = self.no_estado["address"]
-                    propagar_mensagem(self.no_estado, msg)
+                    propagar_mensagem(self.no_estado, msg, self.no_estado["peers"])
             
                     # 3. Atualiza a UI (Saldo)
                     self.root.after(0, self.atualizar_saldo_ui)
@@ -163,5 +163,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     root = tk.Tk()
-    app = BlockchainApp(root, "localhost", args.port, args.bootstrap)
+    app = BlockchainApp(root, "10.111.64.242", args.port, args.bootstrap)
     root.mainloop()

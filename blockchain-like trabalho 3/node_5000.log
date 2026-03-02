@@ -1,0 +1,44 @@
+INFO:Node:5000:Nó procedural ativo em localhost:5000
+INFO:Node:5000:Minerando bloco #1...
+INFO:Node:5000:Mensagem NEW_BLOCK propagada para 0 peers.
+INFO:Node:5000:Resposta RESPONSE_CHAIN encaminhada localhost:5001
+ERROR:Node:5000:Erro ao tratar cliente ('127.0.0.1', 64590): 'str' object has no attribute 'value'
+INFO:Node:5000:Nó procedural ativo em localhost:5000
+INFO:Node:5000:Resposta RESPONSE_CHAIN encaminhada localhost:5001
+ERROR:Node:5000:Erro ao tratar cliente ('127.0.0.1', 51392): name 'peer_addr' is not defined
+INFO:Node:5000:Nó procedural ativo em localhost:5000
+INFO:Node:5000:Minerando bloco #1...
+INFO:Node:5000:Mensagem NEW_BLOCK propagada para 0 peers.
+INFO:Node:5000:Resposta RESPONSE_CHAIN encaminhada localhost:5001
+ERROR:Node:5000:Erro ao tratar cliente ('127.0.0.1', 51409): name 'peer_addr' is not defined
+INFO:Node:5000:Nó procedural ativo em localhost:5000
+INFO:Node:5000:Minerando bloco #1...
+INFO:Node:5000:Mensagem NEW_BLOCK propagada para 0 peers.
+INFO:Node:5000:Resposta RESPONSE_CHAIN encaminhada localhost:5001
+ERROR:Node:5000:Falha ao conectar em ('127.0.0.1', 60003): Object of type set is not JSON serializable
+INFO:Node:5000:Nó procedural ativo em localhost:5000
+INFO:Node:5000:Minerando bloco #1...
+INFO:Node:5000:Mensagem NEW_BLOCK propagada para 0 peers.
+INFO:Node:5000:Resposta RESPONSE_CHAIN encaminhada localhost:5001
+ERROR:Node:5000:Falha ao conectar em ('127.0.0.1', 53550): Object of type set is not JSON serializable
+INFO:Node:5000:Nó procedural ativo em localhost:5000
+INFO:Node:5000:Resposta RESPONSE_CHAIN encaminhada localhost:5001
+ERROR:Node:5000:Falha ao conectar em ('127.0.0.1', 61806): Object of type set is not JSON serializable
+INFO:Node:5000:Nó procedural ativo em localhost:5000
+INFO:Node:5000:Resposta RESPONSE_CHAIN encaminhada localhost:5001
+ERROR:Node:5000:Falha ao conectar em ('127.0.0.1', 64637): Object of type set is not JSON serializable
+INFO:Node:5000:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5000:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5000:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5000:Nó procedural ativo em localhost:5000
+INFO:Node:5000:Resposta RESPONSE_CHAIN encaminhada localhost:5001
+ERROR:Node:5000:Falha ao conectar em ('127.0.0.1', 65150): Object of type set is not JSON serializable
+INFO:Node:5000:Minerando bloco #1...
+INFO:Node:5000:Mensagem NEW_BLOCK propagada para 0 peers.
+INFO:Node:5000:Nó procedural ativo em localhost:5000
+INFO:Node:5000:Resposta RESPONSE_CHAIN encaminhada localhost:5001
+ERROR:Node:5000:Falha ao conectar em ('127.0.0.1', 51426): Object of type set is not JSON serializable
+INFO:Node:5000:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5000:Minerando bloco #1...
+INFO:Node:5000:Mensagem NEW_BLOCK propagada para 0 peers.
+INFO:Node:5000:Mensagem REQUEST_CHAIN propagada para 0 peers.
