@@ -13,7 +13,7 @@ def calcular_hash_bloco(bloco: Dict[str, Any]) -> str:
     """
     # Criamos uma cópia para não alterar o bloco original e removemos o hash
     dados_para_hash = bloco.copy()
-    dados_para_hash.pop("hash", None) 
+    dados_para_hash.pop("hash", None)
     
     # sort_keys=True é VITAL para que o JSON seja sempre igual, 
     # caso contrário, a ordem das chaves mudaria o hash.
@@ -31,7 +31,7 @@ def criar_bloco(index: int, previous_hash: str, transacoes: List[Dict],
         "previous_hash": previous_hash,
         "transactions": transacoes,
         "nonce": nonce,
-        "timestamp": timestamp if timestamp else time.time(),
+        "timestamp": timestamp if timestamp != None else time.time(),
         "hash": hash_bloco
     }
     
@@ -50,7 +50,7 @@ def criar_bloco_genesis() -> Dict[str, Any]:
         previous_hash="0" * 64,
         transacoes=[],
         nonce=0,
-        timestamp=1234567890.0  # Um valor fixo garante que o hash do gênesis seja o mesmo para todos
+        timestamp=0  # Um valor fixo garante que o hash do gênesis seja o mesmo para todos
     )
 
 def validar_proof_of_work(bloco: Dict[str, Any], dificuldade: str = "000") -> bool:

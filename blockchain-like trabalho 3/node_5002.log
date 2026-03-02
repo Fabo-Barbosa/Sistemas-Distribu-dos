@@ -1,0 +1,14 @@
+INFO:Node:5002:Nó procedural ativo em localhost:5002
+INFO:Node:5002:Não há peers desconhecidos na lista
+INFO:Node:5002:Conectado ao peer localhost:5000
+INFO:Node:5002:Resposta PONG encaminhada localhost:5001
+INFO:Node:5002:Nó procedural ativo em localhost:5002
+INFO:Node:5002:Não há peers desconhecidos na lista
+INFO:Node:5002:Conectado ao peer localhost:5000
+INFO:Node:5002:Resposta PONG encaminhada localhost:5001
+ERROR:Node:5002:Erro ao tratar cliente ('127.0.0.1', 53000): name 'adicionar_bloco_na_blockchain' is not defined
+INFO:Node:5002:Nó procedural ativo em localhost:5002
+INFO:Node:5002:Não há peers desconhecidos na lista
+INFO:Node:5002:Conectado ao peer localhost:5000
+INFO:Node:5002:Novo bloco #1 adicionado via rede.
+INFO:Node:5002:Mensagem REQUEST_CHAIN propagada para 0 peers.

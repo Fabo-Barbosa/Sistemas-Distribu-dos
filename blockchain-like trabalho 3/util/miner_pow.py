@@ -59,8 +59,7 @@ def minerar_bloco(
         # Verifica se atingiu a dificuldade
         if validar_proof_of_work(bloco, dificuldade):
             no_estado["mining_active"] = False
-            if adicionar_bloco(no_estado["blockchain"], bloco):
-                return bloco
+            return bloco
 
         # Incrementa o nonce para a próxima tentativa
         bloco["nonce"] += 1

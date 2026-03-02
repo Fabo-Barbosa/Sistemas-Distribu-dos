@@ -104,12 +104,11 @@ def validar_cadeia_completa(chain: List[Dict]) -> bool:
     Útil para quando recebemos a cadeia de outro nó.
     """
     if not chain: return False
-    
     # Valida Gênesis
     genesis_esperado = criar_bloco_genesis()
+
     if chain[0]["hash"] != genesis_esperado["hash"]:
         return False
-        
     # Valida o encadeamento
     for i in range(1, len(chain)):
         bloco_atual = chain[i]
@@ -122,4 +121,37 @@ def validar_cadeia_completa(chain: List[Dict]) -> bool:
         if not validar_proof_of_work(bloco_atual, DIFICULDADE):
             return False
             
+    return True
+
+def substituir_pela_corrente_mais_longa(no_estado: Dict[str, Any], chain_recebida: List[Dict]) -> bool:
+    """
+    Aplica a regra da corrente mais longa (Nakamoto Consensus).
+    Retorna True se a cadeia local foi substituída.
+    """
+
+    blockchain_local = no_estado["blockchain"]
+    
+    # 1. Verifica se a nova cadeia é realmente maior
+    if len(chain_recebida) <= len(blockchain_local["chain"]):
+        return False
+
+    # 2. Valida a integridade da cadeia recebida (hashes e Proof of Work)
+    if not validar_cadeia_completa(chain_recebida):
+        no_estado["logger"].warning("Recebida uma blockchain maior, porém inválida.")
+        return False
+
+    # 3. Substituição atômica
+    with no_estado["lock"]:
+        blockchain_local["chain"] = chain_recebida
+        # Limpa da mempool local transações que já estão na nova cadeia
+        txs_na_nova_chain = set()
+        for bloco in chain_recebida:
+            for tx in bloco["transactions"]:
+                txs_na_nova_chain.add(tx["id"])
+        print(4)
+        blockchain_local["pending_transactions"] = [
+            tx for tx in blockchain_local["pending_transactions"] 
+            if tx["id"] not in txs_na_nova_chain
+        ]
+    
     return True

@@ -112,17 +112,32 @@ class BlockchainApp:
 
     def acao_minerar(self):
         """Roda a mineração em uma thread para não travar a GUI."""
+        # No main.py, dentro da função tarefa() da acao_minerar
         def tarefa():
             self.log("Iniciando mineração...")
             bloco = minerar_bloco(self.no_estado, self.no_estado["address"])
+    
             if bloco:
-                self.log(f"Bloco #{bloco['index']} minerado com sucesso!")
-                # Propaga o novo bloco
-                msg = msg_novo_bloco(bloco)
-                propagar_mensagem(self.no_estado, msg)
-                self.root.after(0, self.atualizar_saldo_ui)
+                # --- CORREÇÃO AQUI ---
+                # 1. Adiciona o bloco a si mesmo primeiro
+                from util.blockchain import adicionar_bloco
+                sucesso = adicionar_bloco(self.no_estado["blockchain"], bloco)
+        
+                if sucesso:
+                    self.log(f"Bloco #{bloco['index']} minerado e adicionado localmente!")
+            
+                    # 2. Propaga para os outros
+                    from util.protocolo import msg_novo_bloco
+                    msg = msg_novo_bloco(bloco)
+                    msg["sender"] = self.no_estado["address"]
+                    propagar_mensagem(self.no_estado, msg)
+            
+                    # 3. Atualiza a UI (Saldo)
+                    self.root.after(0, self.atualizar_saldo_ui)
+                else:
+                    self.log("Bloco minerado é inválido para a blockchain local.")
             else:
-                self.log("Mineração interrompida ou falhou.")
+                self.log("Mineração interrompida.")
 
         threading.Thread(target=tarefa, daemon=True).start()
 
@@ -137,7 +152,7 @@ class BlockchainApp:
         msg = msg_solicitar_chain()
         # Adiciona o sender para o peer saber para quem responder
         msg["sender"] = self.no_estado["address"] 
-        propagar_mensagem(self.no_estado, msg)
+        propagar_mensagem(self.no_estado, msg, self.no_estado["peers"])
         self.atualizar_saldo_ui()
 
 # --- Inicialização ---
