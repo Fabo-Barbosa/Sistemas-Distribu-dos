@@ -118,7 +118,6 @@ class BlockchainApp:
             bloco = minerar_bloco(self.no_estado, self.no_estado["address"])
     
             if bloco:
-                # --- CORREÇÃO AQUI ---
                 # 1. Adiciona o bloco a si mesmo primeiro
                 from util.blockchain import adicionar_bloco
                 sucesso = adicionar_bloco(self.no_estado["blockchain"], bloco)
@@ -158,10 +157,11 @@ class BlockchainApp:
 # --- Inicialização ---
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--h", type=str, default="localhost")
     parser.add_argument("--port", type=int, default=5000)
     parser.add_argument("--bootstrap", nargs="*", default=[])
     args = parser.parse_args()
 
     root = tk.Tk()
-    app = BlockchainApp(root, "10.111.64.242", args.port, args.bootstrap)
+    app = BlockchainApp(root, args.h, args.port, args.bootstrap)
     root.mainloop()

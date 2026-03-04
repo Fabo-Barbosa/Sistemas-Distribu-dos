@@ -24,7 +24,6 @@ def criar_estado_no(host: str = "localhost", port: int = 5000) -> Dict[str, Any]
     """
     Inicializa o 'cérebro' do nó. Substitui o __init__ da classe Node.
     """
-    #print(port)
     return {
         "host": host,
         "port": port,
@@ -57,7 +56,6 @@ def _loop_aceitar_conexoes(no_estado: Dict[str, Any]):
     while no_estado["running"]:
         try:
             client_sock, addr = no_estado["server_socket"].accept()
-            print(f"Aceitando conexão de {addr}")
             thread = threading.Thread(target=_tratar_cliente, args=(no_estado, client_sock, addr))
             thread.daemon = True
             thread.start()
@@ -86,14 +84,11 @@ def _tratar_cliente(no_estado: Dict[str, Any], sock: socket.socket, addr: tuple)
         # 4. Enviar resposta, se houver
         if resposta:
             try:
-                host, port = mensagem["sender"].split(":")
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                    sock.settimeout(5)
-                    sock.connect((host, int(port)))
-                    msgBytes = mensagem_para_bytes(resposta)
-                    sock.sendall(msgBytes)
+                print(resposta)
+                msgBytes = mensagem_para_bytes(resposta)
+                sock.sendall(msgBytes)
 
-                    no_estado["logger"].info(f"Resposta {resposta["type"]} encaminhada {mensagem["sender"]}")
+                no_estado["logger"].info(f"Resposta {resposta["type"]} encaminhada {addr}")
             except Exception as e:
                 no_estado["logger"].error(f"Falha ao conectar em {addr}: {e}")
 
@@ -110,14 +105,13 @@ def _processar_mensagem(no_estado: Dict[str, Any], msg: Dict[str, Any]) -> Optio
     m_type = msg.get("type")
     sender = msg.get("sender")
     payload = msg.get("payload", {})
-    print(payload)
-    print(m_type)
+
+    if sender != no_estado["address"] and sender not in no_estado["peers"]:
+        no_estado["peers"].add(sender)
 
     with no_estado["lock"]:
         if m_type == MessageType.PING.value:
-            print(1)
             if sender not in no_estado.get("peers"):
-                print(2)
                 no_estado["peers"].add(sender)
             pong_msg = msg_pong()
             pong_msg["sender"] = no_estado["address"]
@@ -129,7 +123,7 @@ def _processar_mensagem(no_estado: Dict[str, Any], msg: Dict[str, Any]) -> Optio
             return None
         
         elif m_type == MessageType.DISCOVER_PEERS.value:
-            return criar_mensagem(MessageType.PEERS_LIST, {"peers": no_estado.get("peers")}, no_estado.get("address"))
+            return criar_mensagem(MessageType.PEERS_LIST, {"peers": list(no_estado.get("peers"))}, no_estado.get("address"))
         
         elif m_type == MessageType.PEERS_LIST.value:
             novos_peers = payload["peers"] - no_estado["peers"] - {no_estado["address"]}
@@ -212,6 +206,9 @@ def conectar_a_peer(no_estado: Dict[str, Any], peer_addr: str):
         if (conectado == False):
             no_estado["logger"].error(f"Falha ao conectar em {peer_addr}")
             return
+        
+        if peer_addr not in no_estado["peers"]:
+            no_estado["peers"].add(peer_addr)
 
         if resposta and resposta["type"] == MessageType.RESPONSE_CHAIN.value:
             block_dict_list = resposta["payload"]["blockchain"]["chain"]

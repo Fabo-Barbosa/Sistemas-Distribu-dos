@@ -12,3 +12,11 @@ INFO:Node:5002:Não há peers desconhecidos na lista
 INFO:Node:5002:Conectado ao peer localhost:5000
 INFO:Node:5002:Novo bloco #1 adicionado via rede.
 INFO:Node:5002:Mensagem REQUEST_CHAIN propagada para 0 peers.
+INFO:Node:5002:Nó procedural ativo em localhost:5002
+INFO:Node:5002:Mensagem PING propagada para 1 peers.
+INFO:Node:5002:Conectado ao peer localhost:5000
+INFO:Node:5002:Minerando bloco #2...
+INFO:Node:5002:Mensagem NEW_BLOCK propagada para 2 peers.
+INFO:Node:5002:Resposta PONG encaminhada ('127.0.0.1', 56762)
+INFO:Node:5002:Resposta RESPONSE_CHAIN encaminhada ('127.0.0.1', 56766)
+INFO:Node:5002:Novo bloco #3 adicionado via rede.

@@ -1,62 +1,27 @@
 INFO:Node:5001:NÃ³ procedural ativo em localhost:5001
+INFO:Node:5001:NÃ£o hÃ¡ peers desconhecidos na lista
 INFO:Node:5001:Conectado ao peer localhost:5000
+INFO:Node:5001:Minerando bloco #1...
+INFO:Node:5001:Mensagem NEW_BLOCK propagada para 0 peers.
 INFO:Node:5001:NÃ³ procedural ativo em localhost:5001
-INFO:Node:5001:Mensagem PING propagada para 1 peers.
+INFO:Node:5001:NÃ£o hÃ¡ peers desconhecidos na lista
 INFO:Node:5001:Conectado ao peer localhost:5000
-ERROR:Node:5001:Erro ao tratar cliente ('127.0.0.1', 33098): name 'adicionar_bloco_na_blockchain' is not defined
+INFO:Node:5001:Mensagem REQUEST_CHAIN propagada para 1 peers.
+INFO:Node:5001:Blockchain sincronizada com a versÃ£o mais longa dos peers.
+INFO:Node:5001:Minerando bloco #2...
+INFO:Node:5001:Mensagem NEW_BLOCK propagada para 1 peers.
 INFO:Node:5001:NÃ³ procedural ativo em localhost:5001
 INFO:Node:5001:NÃ£o hÃ¡ peers desconhecidos na lista
 INFO:Node:5001:Conectado ao peer localhost:5000
 INFO:Node:5001:Novo bloco #1 adicionado via rede.
-ERROR:Node:5001:Erro ao tratar cliente ('127.0.0.1', 39750): propagar_mensagem() got an unexpected keyword argument 'ignore_addr'
-INFO:Node:5001:Nó procedural ativo em localhost:5001
-INFO:Node:5001:Aguardando conexão de localhost:5000 via endereço de escuta principal.
-INFO:Node:5001:Mensagem REQUEST_CHAIN propagada para 0 peers.
-INFO:Node:5001:Nó procedural ativo em localhost:5001
-INFO:Node:5001:Aguardando conexão de localhost:5000 via endereço de escuta principal.
-ERROR:Node:5001::Falha ao extrair dados, é possível que o nó mande para o endereço main' timed out
-INFO:Node:5001:Mensagem recebida no endereço principal.
+INFO:Node:5001:Resposta RESPONSE_CHAIN encaminhada ('127.0.0.1', 48224)
+INFO:Node:5001:Minerando bloco #2...
+INFO:Node:5001:Mensagem NEW_BLOCK propagada para 1 peers.
+INFO:Node:5001:NÃ³ procedural ativo em localhost:5001
+INFO:Node:5001:NÃ£o hÃ¡ peers desconhecidos na lista
 INFO:Node:5001:Conectado ao peer localhost:5000
-INFO:Node:5001:Nó procedural ativo em localhost:5001
-INFO:Node:5001:Aguardando conexão de localhost:5000 via endereço de escuta principal.
-ERROR:Node:5001::Falha ao extrair dados, é possível que o nó mande para o endereço main' timed out
-INFO:Node:5001:Mensagem recebida no endereço principal.
-INFO:Node:5001:Conectado ao peer localhost:5000
-INFO:Node:5001:Mensagem REQUEST_CHAIN propagada para 0 peers.
-INFO:Node:5001:Nó procedural ativo em localhost:5001
-INFO:Node:5001:Aguardando conexão de localhost:5000 via endereço de escuta principal.
-INFO:Node:5001:Mensagem REQUEST_CHAIN propagada para 0 peers.
-ERROR:Node:5001::Falha ao extrair dados, é possível que o nó mande para o endereço main' timed out
-INFO:Node:5001:Mensagem recebida no endereço principal.
-INFO:Node:5001:Conectado ao peer localhost:5000
-INFO:Node:5001:Mensagem REQUEST_CHAIN propagada para 0 peers.
-INFO:Node:5001:Nó procedural ativo em localhost:5001
-INFO:Node:5001:Aguardando conexão de localhost:5000 via endereço de escuta principal.
-ERROR:Node:5001::Falha ao extrair dados, é possível que o nó mande para o endereço main' timed out
-INFO:Node:5001:Mensagem recebida no endereço principal.
-INFO:Node:5001:Conectado ao peer localhost:5000
-INFO:Node:5001:Mensagem REQUEST_CHAIN propagada para 0 peers.
-INFO:Node:5001:Nó procedural ativo em localhost:5001
-INFO:Node:5001:Aguardando conexão de localhost:5000 via endereço de escuta principal.
-ERROR:Node:5001::Falha ao extrair dados, é possível que o nó mande para o endereço main' timed out
-INFO:Node:5001:Mensagem recebida no endereço principal.
-INFO:Node:5001:Conectado ao peer localhost:5000
-INFO:Node:5001:Nó procedural ativo em localhost:5001
-INFO:Node:5001:Aguardando conexão de localhost:5000 via endereço de escuta principal.
-INFO:Node:5001:Minerando bloco #1...
-INFO:Node:5001:Mensagem NEW_BLOCK propagada para 0 peers.
-ERROR:Node:5001::Falha ao extrair dados, é possível que o nó mande para o endereço main' timed out
-INFO:Node:5001:Mensagem recebida no endereço principal.
-INFO:Node:5001:Conectado ao peer localhost:5000
-INFO:Node:5001:Nó procedural ativo em localhost:5001
-INFO:Node:5001:Aguardando conexão de localhost:5000 via endereço de escuta principal.
-ERROR:Node:5001::Falha ao extrair dados, é possível que o nó mande para o endereço main' timed out
-INFO:Node:5001:Mensagem recebida no endereço principal.
-INFO:Node:5001:Conectado ao peer localhost:5000
-INFO:Node:5001:Mensagem REQUEST_CHAIN propagada para 0 peers.
-INFO:Node:5001:Mensagem REQUEST_CHAIN propagada para 0 peers.
-INFO:Node:5001:Nó procedural ativo em localhost:5001
-INFO:Node:5001:Aguardando conexão de localhost:5000 via endereço de escuta principal.
-ERROR:Node:5001::Falha ao extrair dados, é possível que o nó mande para o endereço main' timed out
-INFO:Node:5001:Mensagem recebida no endereço principal.
-INFO:Node:5001:Conectado ao peer localhost:5000
+INFO:Node:5001:Resposta PONG encaminhada ('127.0.0.1', 35360)
+INFO:Node:5001:Novo bloco #2 adicionado via rede.
+INFO:Node:5001:Resposta PONG encaminhada ('127.0.0.1', 34462)
+INFO:Node:5001:Resposta RESPONSE_CHAIN encaminhada ('127.0.0.1', 34476)
+INFO:Node:5001:Novo bloco #3 adicionado via rede.

@@ -27,7 +27,6 @@ def mensagem_para_bytes(mensagem: Dict[str, Any]) -> bytes:
     # Garantir que o tipo seja a string do valor do Enum se necessário
     if isinstance(mensagem["type"], MessageType):
         mensagem["type"] = mensagem["type"].value
-        
     corpo_json = json.dumps(mensagem).encode('utf-8')
     tamanho = len(corpo_json)
     return tamanho.to_bytes(4, 'big') + corpo_json
